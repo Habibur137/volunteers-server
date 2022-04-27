@@ -102,6 +102,10 @@ const run = async () => {
   }
 };
 run().catch(console.dir);
+
+app.get("/", (req, res) => {
+  res.send("hello heroku");
+});
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
