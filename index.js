@@ -8,10 +8,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.vjag1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -24,6 +20,9 @@ const run = async () => {
     const volunteersCollection = client
       .db("volunteersServices")
       .collection("services");
+    const bookingCollection = client
+      .db("volunteersServices")
+      .collection("booking");
 
     // get all data -----======-------=======-------=======-------======-------
     app.get("/volunteers", async (req, res) => {
@@ -50,6 +49,20 @@ const run = async () => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await volunteersCollection.deleteOne(query);
+      res.send(result);
+    });
+    // post booking data -------========-------========--------========---------
+    app.post("/volunteersbooking", async (req, res) => {
+      const bookingData = req.body;
+      const result = await bookingCollection.insertOne(bookingData);
+      res.send(result);
+    });
+    // get booking data--------=======----------==========------------=============--------
+    app.get("/volunteersbooking", async (req, res) => {
+      const email = req.query.email;
+      const query = { email };
+      const cursor = bookingCollection.find(query);
+      const result = await cursor.toArray();
       res.send(result);
     });
   } finally {
